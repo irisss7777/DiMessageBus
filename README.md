@@ -9,7 +9,8 @@ A lightweight, high-performance integration layer between [MessagePipe](https://
 
 ## 📋 Table of Contents
   - [✨ Features](#-features)
-  - [Step 1: Define Your Message Types](#step-1-define-your-message-types)
+  - [📦 Installation](#-installation)
+  - [🚀 Usage Example](#-complete-usage-example)
 
 ## ✨ Features
 
