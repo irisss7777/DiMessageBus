@@ -46,7 +46,7 @@ Add the following to your `Packages/manifest.json`:
 ## 🚀 Complete Usage Example
 
 Step 1: Define Your Message Types
-```
+```csharp
 // Signal for creating a lobby
 public struct CreateLobbySignal
 {
@@ -69,7 +69,7 @@ public struct ConnectedLobbyDto
 ```
 
 Step 2: Create an Installer to Bind MessageBus
-```
+```csharp
 using MessagePipe;
 using Zenject;
 
@@ -110,7 +110,7 @@ public class MessageInstaller : MonoInstaller
 ```
 
 Step 3: Create a Service that Subscribes to Messages
-```
+```csharp
 using System;
 using System.Threading;
 using MessagePipe;
@@ -185,7 +185,7 @@ public class WebLobbyService : IInitializable, IMessageDisposable
 ```
 
 Step 4: Publish Messages from Anywhere
-```
+```csharp
 using Zenject;
 
 public class LobbyController : MonoBehaviour
@@ -230,7 +230,7 @@ public class NetworkManager : MonoBehaviour
 ```
 
 Step 5: Simple Component Example (MonoBehaviour)
-```
+```csharp
 using UnityEngine;
 using Zenject;
 
