@@ -7,6 +7,10 @@
 
 A lightweight, high-performance integration layer between [MessagePipe](https://github.com/Cysharp/MessagePipe) and [Zenject](https://github.com/modesttree/Zenject) for Unity projects. Simplifies the pub/sub pattern with automatic dependency resolution, caching, and lifecycle management.
 
+## 📋 Table of Contents
+  - [✨ Features](#-features)
+  - [Step 1: Define Your Message Types](#step-1-define-your-message-types)
+
 ## ✨ Features
 
 - **Automatic Caching** - Publishers and subscribers are cached by type for optimal performance
