@@ -27,7 +27,7 @@ First, install the required dependencies:
 
 ### Method 1: Unity Package Install
 
-**[DiMessageBus_Package](https://github.com/irisss7777/DiMessageBus/releases/tag/DiMessageBus)** (Extenject) - UnityPackage
+**[DiMessageBus](https://github.com/irisss7777/DiMessageBus/releases/tag/DiMessageBus)** - UnityPackage
 
 ### Method 2: Unity Package Manager (Git URL)
 
