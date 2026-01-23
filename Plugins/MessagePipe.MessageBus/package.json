@@ -1,0 +1,12 @@
+{
+    "name": "com.cysharp.messagepipe.messagebus",
+    "displayName": "DiMessageBus",
+    "author": { "name": "Irbisss", "url": "" },
+    "version": "1.0.0",
+    "unity": "2018.4",
+    "description": "High performance messaging pipeline.",
+    "keywords": [ "pubsub", "event", "Scripting", "DI", "DiMessageBus", "MessageBus", "MessagePipe" ],
+    "license": "",
+    "category": "Scripting",
+    "dependencies": {}
+}
