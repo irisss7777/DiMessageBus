@@ -18,7 +18,14 @@ A lightweight, high-performance integration layer between [MessagePipe](https://
 
 ## 📦 Installation
 
-### Using Unity Package Manager
+### Prerequisites
+
+First, install the required dependencies:
+
+1. **[MessagePipe](https://github.com/Cysharp/MessagePipe)** - via Unity Package Manager
+2. **[Zenject](https://github.com/modesttree/Zenject)** (Extenject) - via Unity Package Manager
+
+### Method 1: Unity Package Manager (Git URL)
 
 Add the following to your `Packages/manifest.json`:
 
@@ -27,6 +34,6 @@ Add the following to your `Packages/manifest.json`:
   "dependencies": {
     "com.cysharp.messagepipe": "1.7.0",
     "com.modesttree.zenject": "9.2.0",
-    "com.yourusername.messagepipe-zenject": "https://github.com/yourusername/MessagePipe.Zenject.Integration.git#v1.0.0"
+    "com.irisss.dimessagebus": "https://github.com/irisss7777/DiMessageBus.git"
   }
 }
