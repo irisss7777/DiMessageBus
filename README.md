@@ -50,14 +50,13 @@ Step 1: Define Your Message Types
 // Signal for creating a lobby
 public struct CreateLobbySignal
 {
-    public string LobbyName;
-    public int MaxPlayers;
+
 }
 
 // Signal for starting the game
 public struct StartGameSignal
 {
-    public string GameMode;
+
 }
 
 // DTO for connected lobby information
@@ -110,3 +109,158 @@ public class MessageInstaller : MonoInstaller
 }
 ```
 
+Step 3: Create a Service that Subscribes to Messages
+```
+using System;
+using System.Threading;
+using MessagePipe;
+using UnityEngine;
+using Zenject;
+
+public class WebLobbyService : IInitializable, IMessageDisposable
+{
+    [Inject] private readonly MessageBus _messageBus;
+    [Inject] private readonly WebServiceHandler _webServiceHandler;
+    
+    private CancellationTokenSource _cancellationTokenSource;
+    private LobbyService.LobbyServiceClient _lobbyService;
+    private AccessToken _accessToken;
+
+    // Required for automatic subscription cleanup
+    public event Action OnDispose;
+
+    public void Initialize()
+    {
+        // Subscribe to multiple message types with automatic disposal
+        _messageBus.Subscribe<CreateLobbySignal>((CreateLobbySignal signal) => OnCreateLobby(), this);
+        _messageBus.Subscribe<StartGameSignal>((StartGameSignal signal) => OnStartGame(), this);
+
+        SetupService();
+    }
+
+    private void OnCreateLobby()
+    {
+        Debug.Log($"Creating lobby: {signal.LobbyName} for {signal.MaxPlayers} players");
+        CreateLobby(signal).Forget(); // Using UniTask's Forget() for fire-and-forget
+    }
+
+    private void OnStartGame()
+    {
+        Debug.Log($"Starting game with mode: {signal.GameMode}");
+        StartGame(signal).Forget();
+    }
+
+    private async UniTaskVoid CreateLobby()
+    {
+        // Async lobby creation logic
+        var lobby = await _lobbyService.CreateLobbyAsync();
+        _messageBus.Publish(new ConnectedLobbyDto
+        {
+            LobbyId = lobby.Id,
+            LobbyName = lobby.Name,
+            PlayerCount = lobby.PlayerCount
+        });
+    }
+
+    private async UniTaskVoid StartGame()
+    {
+        // Async game start logic
+        await _lobbyService.StartGameAsync();
+    }
+
+    private void SetupService()
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+        // Additional setup logic
+    }
+
+    // Cleanup when service is disposed (called by Zenject)
+    public void Dispose()
+    {
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
+        OnDispose?.Invoke(); // This will automatically unsubscribe all message subscriptions
+    }
+}
+```
+
+Step 4: Publish Messages from Anywhere
+```
+using Zenject;
+
+public class LobbyController : MonoBehaviour
+{
+    [Inject] private MessageBus _messageBus;
+    
+    public void OnCreateLobbyButtonClicked()
+    {
+        // Publish a message when UI button is clicked
+        _messageBus.Publish(new CreateLobbySignal
+        {
+            LobbyName = "My Awesome Lobby",
+            MaxPlayers = 4
+        });
+    }
+
+    public void OnGameStartButtonClicked()
+    {
+        // Publish a message to start the game
+        _messageBus.Publish(new StartGameSignal
+        {
+            GameMode = "Deathmatch"
+        });
+    }
+}
+
+public class NetworkManager : MonoBehaviour
+{
+    [Inject] private MessageBus _messageBus;
+    
+    private void OnLobbyConnected(LobbyInfo lobbyInfo)
+    {
+        // Publish a DTO when network event occurs
+        _messageBus.Publish(new ConnectedLobbyDto
+        {
+            LobbyId = lobbyInfo.Id,
+            LobbyName = lobbyInfo.Name,
+            PlayerCount = lobbyInfo.Players.Count
+        });
+    }
+}
+```
+
+Step 5: Simple Component Example (MonoBehaviour)
+```
+using UnityEngine;
+using Zenject;
+
+public class SimpleMessageHandler : MonoBehaviour, IMessageDisposable
+{
+    [Inject] private MessageBus _messageBus;
+    
+    public event Action OnDispose;
+    
+    private void Start()
+    {
+        // Subscribe to messages
+        _messageBus.Subscribe<ConnectedLobbyDto>((ConnectedLobbyDto message) => OnLobbyConnected(message), this);
+    }
+    
+    private void OnLobbyConnected(ConnectedLobbyDto dto)
+    {
+        Debug.Log($"Connected to lobby: {dto.LobbyName} with {dto.PlayerCount} players");
+        UpdateUI(dto);
+    }
+    
+    private void UpdateUI(ConnectedLobbyDto dto)
+    {
+        // Update your UI here
+    }
+    
+    private void OnDestroy()
+    {
+        // Automatically unsubscribes all message subscriptions
+        OnDispose?.Invoke();
+    }
+}
+```
