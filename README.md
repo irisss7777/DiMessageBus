@@ -25,7 +25,11 @@ First, install the required dependencies:
 1. **[MessagePipe](https://github.com/Cysharp/MessagePipe)** - via Unity Package Manager
 2. **[Zenject](https://github.com/modesttree/Zenject)** (Extenject) - via Unity Package Manager
 
-### Method 1: Unity Package Manager (Git URL)
+### Method 1: Unity Package Install
+
+**[DiMessageBus_Package](https://github.com/irisss7777/DiMessageBus/releases/tag/DiMessageBus)** (Extenject) - UnityPackage
+
+### Method 2: Unity Package Manager (Git URL)
 
 Add the following to your `Packages/manifest.json`:
 
