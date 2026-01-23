@@ -41,3 +41,71 @@ Add the following to your `Packages/manifest.json`:
     "com.irisss.dimessagebus": "https://github.com/irisss7777/DiMessageBus.git"
   }
 }
+
+## 🚀 Complete Usage Example
+
+Step 1: Define Your Message Types
+```
+// Signal for creating a lobby
+public struct CreateLobbySignal
+{
+    public string LobbyName;
+    public int MaxPlayers;
+}
+
+// Signal for starting the game
+public struct StartGameSignal
+{
+    public string GameMode;
+}
+
+// DTO for connected lobby information
+public struct ConnectedLobbyDto
+{
+    public string LobbyId;
+    public string LobbyName;
+    public int PlayerCount;
+}
+```
+
+Step 2: Create an Installer to Bind MessageBus
+```
+using MessagePipe;
+using Zenject;
+
+public class MessageInstaller : MonoInstaller
+{
+    public override void InstallBindings()
+    {
+        // Bind MessagePipe to the container
+        var options = Container.BindMessagePipe();
+
+        // Bind MessageBus as single instance (accessible everywhere)
+        Container.Bind<MessageBus>().AsSingle();
+
+        // Register message brokers for all your message types
+        Container.RegisterMessageBroker<CreateLobbySignal>(options);
+        Container.RegisterMessageBroker<StartGameSignal>(options);
+        Container.RegisterMessageBroker<ConnectedLobbyDto>(options);
+        
+        // Optional: Register additional message types in separate methods
+        InputBind(options);
+        WebBind(options);
+    }
+
+    private void InputBind(MessagePipeOptions options)
+    {
+        // Register input-related messages
+        Container.RegisterMessageBroker<PlayerInputSignal>(options);
+        Container.RegisterMessageBroker<UISignal>(options);
+    }
+
+    private void WebBind(MessagePipeOptions options)
+    {
+        // Register web-related messages
+        Container.RegisterMessageBroker<NetworkConnectedSignal>(options);
+        Container.RegisterMessageBroker<NetworkErrorSignal>(options);
+    }
+}
+```
+
