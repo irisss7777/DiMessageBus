@@ -41,6 +41,7 @@ Add the following to your `Packages/manifest.json`:
     "com.irisss.dimessagebus": "https://github.com/irisss7777/DiMessageBus.git"
   }
 }
+```
 
 ## 🚀 Complete Usage Example
 
