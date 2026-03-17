@@ -14,12 +14,13 @@ A lightweight, high-performance integration layer between [MessagePipe](https://
 
 ## ✨ Features
 
-- **Automatic Caching** - Publishers and subscribers are cached by type for optimal performance
-- **Zenject Integration** - Seamlessly works with Zenject's dependency injection
-- **Lifecycle Management** - Subscriptions automatically disposed with Zenject's `IMessageDisposable`
-- **Thread-Safe** - Uses `ConcurrentDictionary` for safe access from multiple threads
-- **Lightweight** - Minimal overhead on top of MessagePipe
-- **Easy to Use** - Simple API that reduces boilerplate code
+- **Automatic Caching** – Publishers and subscribers are cached by type for optimal performance
+- **Zenject Integration** – Seamlessly works with Zenject’s dependency injection
+- **Lifecycle Management** – Subscriptions automatically disposed with Zenject’s IMessageDisposable
+- **Thread-Safe** – Uses ConcurrentDictionary for safe access from multiple threads
+- **Lightweight** – Minimal overhead on top of MessagePipe
+- **Easy to Use** – Simple API that reduces boilerplate code
+- **Async Signals** – Publish a signal and wait for its asynchronous completion using UniTask
 
 ## 📦 Installation
 
@@ -266,6 +267,63 @@ public class SimpleMessageHandler : MonoBehaviour, IMessageDisposable
     {
         // Automatically unsubscribes all message subscriptions
         OnDispose?.Invoke();
+    }
+}
+```
+Step 6: Async Signals – Request/Response Pattern
+
+Async signals allow you to wait for the completion of a signal handler – perfect for operations that need to finish before continuing.
+Subscribe to an Async Signal
+```csharp
+public class EnemyReactionHandler : IMessageDisposable, IInitializable
+{
+    [Inject] private readonly MessageBus _messageBus;
+    
+    private Action<StartReactionEnemySignal> _releaseAction;
+
+    public event Action OnDispose;
+
+    public void Initialize()
+    {
+        // SubscribeAsync returns an Action<T> that must be called when the async work is done
+        _releaseAction = this.SubscribeAsync(_messageBus, (StartReactionEnemySignal signal) => React(signal));
+    }
+
+    private void React(StartReactionEnemySignal signal)
+    {
+        // Perform the reaction – could be synchronous or asynchronous
+        // When finished, invoke _releaseAction(signal) to complete the awaiting task
+        _releaseAction?.Invoke(signal);
+    }
+
+    public void Dispose()
+    {
+        OnDispose?.Invoke();
+    }
+}
+```
+
+Publish an Async Signal and Wait for Completion
+
+```csharp
+private async UniTask PlayReaction(List<ReactionQueueData> reactionQueue)
+{
+    if (reactionQueue == null || reactionQueue.Count == 0)
+        return;
+
+    foreach (var data in reactionQueue)
+    {
+        Type reactionType = data.Reaction.GetDataType();
+
+        // PublishAsync will wait until the handler calls the release action
+        await this.PublishAsync(_messageBus, new StartReactionEnemySignal
+        {
+            Id = Guid.NewGuid(),          // must be unique
+            Type = reactionType,
+            Time = data.Time
+        });
+        
+        // Next reaction will only start after the previous one has completed
     }
 }
 ```
