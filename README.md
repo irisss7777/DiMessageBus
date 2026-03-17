@@ -318,7 +318,6 @@ private async UniTask PlayReaction(List<ReactionQueueData> reactionQueue)
         // PublishAsync will wait until the handler calls the release action
         await this.PublishAsync(_messageBus, new StartReactionEnemySignal
         {
-            Id = Guid.NewGuid(),          // must be unique
             Type = reactionType,
             Time = data.Time
         });
@@ -326,4 +325,24 @@ private async UniTask PlayReaction(List<ReactionQueueData> reactionQueue)
         // Next reaction will only start after the previous one has completed
     }
 }
+```
+
+An asynchronous signal must implement IAsyncSignal and receive a Guid in its constructor.
+
+```csharp
+public struct StartReactionEnemySignal : IAsyncSignal
+    {
+        public IEnemyView View { get; private set; }
+        public Type Type { get; private set; }
+        public float Time { get; private set; }
+        public Guid Id { get; set; }
+
+        public StartReactionEnemySignal(IEnemyView view, Type type, float time)
+        {
+            View = view;
+            Type = type;
+            Time = time;
+            Id = Guid.NewGuid();
+        }
+    }
 ```
